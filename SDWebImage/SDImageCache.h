@@ -73,6 +73,11 @@ typedef void(^SDWebImageCalculateSizeBlock)(NSUInteger fileCount, NSUInteger tot
 @property (assign, nonatomic) NSUInteger maxCacheSize;
 
 /**
+ * Save to disk asynchronously [defaults to YES]
+ */
+@property (assign, nonatomic) BOOL shouldSaveToDiskAsync;
+
+/**
  * Returns global shared cache instance
  *
  * @return SDImageCache global instance

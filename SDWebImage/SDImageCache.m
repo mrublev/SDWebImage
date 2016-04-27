@@ -121,6 +121,9 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
 
         // Disable iCloud
         _shouldDisableiCloud = YES;
+        
+        // Save without wait
+        _shouldSaveToDiskAsync = YES;
 
         dispatch_sync(_ioQueue, ^{
             _fileManager = [NSFileManager new];
@@ -207,7 +210,7 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
     }
 
     if (toDisk) {
-        dispatch_async(self.ioQueue, ^{
+        dispatch_block_t saveBlock = ^{
             NSData *data = imageData;
 
             if (image && (recalculate || !data)) {
@@ -258,7 +261,13 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
                     [fileURL setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:nil];
                 }
             }
-        });
+        };
+        
+        if (self.shouldSaveToDiskAsync) {
+            dispatch_async(self.ioQueue, saveBlock);
+        } else {
+            dispatch_sync(self.ioQueue, saveBlock);
+        }
     }
 }
 
